@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using System.Text.Json;
 
 namespace HttpUnitTesting.Weather;
 
@@ -28,14 +27,13 @@ public class GetWeatherForecastHandler : IRequestHandler<WeatherForecastRequest,
 
         if (httpResponse.IsSuccessStatusCode)
         {
-            var results = await httpResponse.Content.ReadAsStringAsync();
-            var forecast = JsonSerializer.Deserialize<int[]>(results)!;
+            var forecast = await httpResponse.Content.ReadFromJsonAsync<int[]>();
             var weatherForecastResponse = new WeatherForecastResponse
             {
                 WeatherForecasts = Enumerable.Range(1, 5).Select(index => new WeatherForecast
                 {
                     Date = DateTime.Now.AddDays(index),
-                    TemperatureC = forecast[index],
+                    TemperatureC = forecast![index],
                     Summary = Summaries[Random.Shared.Next(Summaries.Length)]
                 })
             };
